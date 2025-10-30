@@ -11,6 +11,9 @@ class CapacitationProvider extends ChangeNotifier {
       taxaConclusao: 0.85,
       taxaEngajamento: 0.9,
       satisfacao: 4.2,
+      area: '',
+      tipo: '',
+      mes: '',
     ),
     Capacitation(
       municipio: 'Rio de Janeiro',
@@ -19,6 +22,9 @@ class CapacitationProvider extends ChangeNotifier {
       taxaConclusao: 0.78,
       taxaEngajamento: 0.88,
       satisfacao: 4.0,
+      area: '',
+      tipo: '',
+      mes: '',
     ),
   ];
 

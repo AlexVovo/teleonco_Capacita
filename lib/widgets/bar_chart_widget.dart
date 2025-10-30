@@ -1,63 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:teleonco_capacita/models/capacitation_model.dart';
 
 class BarChartWidget extends StatelessWidget {
-  const BarChartWidget({super.key});
+  final List<Capacitation> capacitations;
+
+  const BarChartWidget({super.key, required this.capacitations});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Capacitações por Setor',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, _) {
-                          const labels = ['Onco', 'Pedi', 'Geri', 'Outros'];
-                          return Text(labels[value.toInt() % labels.length]);
-                        },
-                      ),
-                    ),
-                  ),
-                  barGroups: [
-                    BarChartGroupData(
-                        x: 0,
-                        barRods: [BarChartRodData(toY: 8, color: Colors.blue)]),
-                    BarChartGroupData(x: 1, barRods: [
-                      BarChartRodData(toY: 6, color: Colors.orange)
-                    ]),
-                    BarChartGroupData(x: 2, barRods: [
-                      BarChartRodData(toY: 5, color: Colors.green)
-                    ]),
-                    BarChartGroupData(x: 3, barRods: [
-                      BarChartRodData(toY: 3, color: Colors.redAccent)
-                    ]),
-                  ],
-                ),
-              ),
-            ),
-          ],
+    if (capacitations.isEmpty) {
+      return const Center(child: Text('Sem dados para exibir'));
+    }
+
+    final Map<String, double> conclusaoMap = {};
+    final Map<String, double> engajamentoMap = {};
+
+    for (var c in capacitations) {
+      conclusaoMap[c.mes] = (conclusaoMap[c.mes] ?? 0) + c.taxaConclusao;
+      engajamentoMap[c.mes] = (engajamentoMap[c.mes] ?? 0) + c.taxaEngajamento;
+    }
+
+    final months = conclusaoMap.keys.toList();
+
+    return BarChart(
+      BarChartData(
+        barGroups: List.generate(months.length, (i) {
+          return BarChartGroupData(x: i, barRods: [
+            BarChartRodData(
+                toY: conclusaoMap[months[i]]! / capacitations.length,
+                color: Colors.green,
+                width: 12),
+            BarChartRodData(
+                toY: engajamentoMap[months[i]]! / capacitations.length,
+                color: Colors.orange,
+                width: 12),
+          ]);
+        }),
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  return Text(
+                      index >= 0 && index < months.length ? months[index] : '');
+                }),
+          ),
+          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
         ),
+        gridData: FlGridData(show: true),
+        borderData: FlBorderData(show: false),
       ),
     );
   }
