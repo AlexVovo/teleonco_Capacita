@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:csv/csv.dart';
 import 'package:teleonco_capacita/models/capacitation_model.dart';
 
 class GoogleSheetsService {
@@ -10,15 +11,25 @@ class GoogleSheetsService {
     final response = await http.get(Uri.parse(sheetUrl));
 
     if (response.statusCode == 200) {
-      final rows = const LineSplitter().convert(response.body);
+      // Faz parse REAL de CSV (tratando vírgulas e aspas corretamente)
+      final rows = const CsvToListConverter(
+        fieldDelimiter: ',',
+        textDelimiter: '"',
+        eol: '\n',
+      ).convert(response.body);
+
       final List<Capacitation> data = [];
 
-      // pula cabeçalho
+      // Pula cabeçalho
       for (int i = 1; i < rows.length; i++) {
-        final row = rows[i].split(',');
+        final row = rows[i];
 
-        if (row.length >= 11) {
-          data.add(Capacitation.fromCsv(row));
+        try {
+          data.add(Capacitation.fromCsv(
+            row.map((e) => e.toString()).toList(),
+          ));
+        } catch (e) {
+          print("⚠️ Erro ao converter linha $i → $e");
         }
       }
 
