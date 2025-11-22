@@ -15,7 +15,7 @@ class SatisfactionChartWidget extends StatelessWidget {
 
     final isMobile = MediaQuery.of(context).size.width < 600;
 
-    // 🔹 Agrupa notas de satisfação (0–5)
+    /// Agrupamento das notas de satisfação
     final ratings = {
       'Excelente':
           capacitations.where((c) => c.satisfacao >= 4.5).length.toDouble(),
@@ -42,10 +42,10 @@ class SatisfactionChartWidget extends StatelessWidget {
 
     final colors = [
       Colors.green.shade600,
-      Colors.lightGreen,
+      Colors.lightGreen.shade700,
       Colors.orangeAccent,
       Colors.redAccent,
-      Colors.grey.shade400,
+      Colors.grey.shade500,
     ];
 
     final sections = ratings.entries.toList().asMap().entries.map((entry) {
@@ -67,57 +67,78 @@ class SatisfactionChartWidget extends StatelessWidget {
       );
     }).toList();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: PieChart(
-            PieChartData(
-              sections: sections,
-              centerSpaceRadius: 45,
-              sectionsSpace: 2,
-              borderData: FlBorderData(show: false),
-              pieTouchData: PieTouchData(
-                enabled: true,
-                touchCallback: (event, response) {},
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chart = Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                "Nível de Satisfação dos Participantes",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // 🔹 Legenda visual
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 12,
-          runSpacing: 8,
-          children: ratings.keys.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final label = entry.value;
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: colors[index],
-                    shape: BoxShape.circle,
-                  ),
+
+            /// GRÁFICO
+            SizedBox(
+              height: isMobile ? 260 : 340,
+              child: PieChart(
+                PieChartData(
+                  sections: sections,
+                  centerSpaceRadius: 40,
+                  sectionsSpace: 2,
+                  borderData: FlBorderData(show: false),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: isMobile ? 11 : 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blueGrey[800],
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// LEGENDA
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 14,
+              runSpacing: 10,
+              children: ratings.keys.toList().asMap().entries.map((entry) {
+                final index = entry.key;
+                final label = entry.value;
+
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: colors[index],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: isMobile ? 11 : 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blueGrey[800],
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ],
+        );
+
+        /// Evitar overflow em telas pequenas
+        return constraints.maxHeight < 400
+            ? SingleChildScrollView(child: chart)
+            : chart;
+      },
     );
   }
 }

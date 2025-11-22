@@ -14,6 +14,7 @@ class CandlestickChartWidget extends StatelessWidget {
     }
 
     final Map<String, List<double>> monthSatisfacao = {};
+
     for (var c in capacitations) {
       monthSatisfacao[c.mes] = (monthSatisfacao[c.mes] ?? [])
         ..add(c.satisfacao);
@@ -25,30 +26,95 @@ class CandlestickChartWidget extends StatelessWidget {
       final values = monthSatisfacao[months[i]]!;
       final min = values.reduce((a, b) => a < b ? a : b);
       final max = values.reduce((a, b) => a > b ? a : b);
-      final avg = values.reduce((a, b) => a + b) / values.length;
-      return BarChartGroupData(x: i, barRods: [
-        BarChartRodData(toY: max, fromY: min, color: Colors.purple, width: 12),
-      ]);
+
+      return BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: max,
+            fromY: min,
+            width: 16,
+            color: Colors.purple,
+            borderRadius: const BorderRadius.all(Radius.circular(4)),
+          ),
+        ],
+      );
     });
 
-    return BarChart(
-      BarChartData(
-        barGroups: candles,
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  final index = value.toInt();
-                  return Text(
-                      index >= 0 && index < months.length ? months[index] : '');
-                }),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          /// 📊 Gráfico — ALTURA RESPONSIVA
+          SizedBox(
+            height: 300,
+            child: BarChart(
+              BarChartData(
+                barGroups: candles,
+                gridData: FlGridData(show: true),
+                borderData: FlBorderData(show: false),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            index >= 0 && index < months.length
+                                ? months[index]
+                                : "",
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: true)),
+                ),
+              ),
+            ),
           ),
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-        ),
-        gridData: FlGridData(show: true),
-        borderData: FlBorderData(show: false),
+
+          const SizedBox(height: 14),
+
+          /// 🟣 LEGENDA
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 18,
+            runSpacing: 10,
+            children: [
+              _legendItem(
+                Colors.purple,
+                "Variação de Satisfação (mín–máx)",
+              ),
+            ],
+          ),
+        ],
       ),
+    );
+  }
+
+  /// 🔘 Caixa de legenda
+  Widget _legendItem(Color color, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+        ),
+      ],
     );
   }
 }

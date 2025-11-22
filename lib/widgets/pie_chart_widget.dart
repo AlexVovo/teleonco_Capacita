@@ -47,7 +47,11 @@ class _PieChartWidgetState extends State<PieChartWidget> {
 
         return Container(
           padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(minHeight: 500),
+          constraints: const BoxConstraints(
+            minHeight: 200, // seguro
+            maxHeight: 600, // evita overflow
+          ),
+          //constraints: const BoxConstraints(minHeight: 500),
           child: isMobile
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -84,18 +88,35 @@ class _PieChartWidgetState extends State<PieChartWidget> {
     );
   }
 
-  // 🔹 Stack que contém gráfico + tooltip (com limitação segura)
   Widget _buildChartStack(
       List<MapEntry<String, int>> entries, List<Color> colors, int total) {
     return LayoutBuilder(builder: (context, constraints) {
-      final chartSize = constraints.biggest;
+      final chartWidth = constraints.maxWidth;
+      final chartHeight = constraints.maxHeight;
+
+      const tooltipWidth = 160;
+      const tooltipHeight = 60;
+      const margin = 10;
+
       return MouseRegion(
         onHover: (event) {
           setState(() {
-            touchPosition = Offset(
-              event.localPosition.dx.clamp(0, chartSize.width - 150),
-              event.localPosition.dy.clamp(20, chartSize.height - 60),
-            );
+            double dx = event.localPosition.dx;
+            double dy = event.localPosition.dy;
+
+            // Ajuste horizontal seguro
+            if (dx + tooltipWidth + margin > chartWidth) {
+              dx = chartWidth - tooltipWidth - margin;
+            }
+            if (dx < margin) dx = margin as double;
+
+            // Ajuste vertical seguro
+            if (dy + tooltipHeight + margin > chartHeight) {
+              dy = chartHeight - tooltipHeight - margin;
+            }
+            if (dy < margin) dy = margin as double;
+
+            touchPosition = Offset(dx, dy);
           });
         },
         onExit: (_) {
