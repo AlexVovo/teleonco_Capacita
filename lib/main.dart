@@ -18,36 +18,27 @@ class TeleoncoCapacitaApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'TeleOnco Capacita',
 
-        // 🌈 NOVO TEMA VISUAL PROFISSIONAL
+        // =========================
+        // 🌞 TEMA CLARO (opcional)
+        // =========================
         theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
           scaffoldBackgroundColor: const Color(0xFFF4F6F9),
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF3B82F6), // azul moderno
-            primary: const Color(0xFF3B82F6),
-            secondary: const Color(0xFF6366F1),
+            seedColor: const Color(0xFF3B82F6),
+            brightness: Brightness.light,
           ),
-          primaryColor: const Color(0xFF3B82F6),
           cardTheme: CardThemeData(
-            elevation: 4,
-            shadowColor: Colors.black12,
+            elevation: 3,
+            color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-            ),
-            color: Colors.white,
-          ),
-          textTheme: const TextTheme(
-            headlineSmall: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-            bodyMedium: TextStyle(
-              color: Color(0xFF475569),
             ),
           ),
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white,
             elevation: 1,
-            shadowColor: Colors.black12,
             titleTextStyle: TextStyle(
               color: Color(0xFF1E293B),
               fontSize: 20,
@@ -56,6 +47,68 @@ class TeleoncoCapacitaApp extends StatelessWidget {
             iconTheme: IconThemeData(color: Color(0xFF1E293B)),
           ),
         ),
+
+        // =========================
+        // 🌙 TEMA ESCURO (FINAL)
+        // =========================
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+
+          // 🔥 FUNDO REALMENTE ESCURO
+          scaffoldBackgroundColor: const Color(0xFF020617),
+
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3B82F6),
+            brightness: Brightness.dark,
+            background: const Color(0xFF020617),
+            surface: const Color(0xFF020617),
+            primary: const Color(0xFF60A5FA),
+            secondary: const Color(0xFF818CF8),
+          ),
+
+          // 🎴 CARDS
+          cardTheme: CardThemeData(
+            elevation: 2,
+            color: const Color(0xFF020617),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+
+          // 📝 TEXTOS
+          textTheme: const TextTheme(
+            headlineSmall: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFE5E7EB),
+            ),
+            titleMedium: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFE5E7EB),
+            ),
+            bodyMedium: TextStyle(
+              color: Color(0xFF94A3B8),
+            ),
+          ),
+
+          // 🧭 APPBAR
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF020617),
+            elevation: 1,
+            titleTextStyle: TextStyle(
+              color: Color(0xFFE5E7EB),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            iconTheme: IconThemeData(color: Color(0xFFE5E7EB)),
+          ),
+
+          dividerColor: const Color(0xFF1E293B),
+        ),
+
+        // 🔒 FORÇAR DARK MODE
+        themeMode: ThemeMode.dark,
+        // 👉 Troque para ThemeMode.system se quiser automático
 
         home: const DashboardScreen(),
       ),
