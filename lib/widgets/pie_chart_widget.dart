@@ -108,13 +108,13 @@ class _PieChartWidgetState extends State<PieChartWidget> {
             if (dx + tooltipWidth + margin > chartWidth) {
               dx = chartWidth - tooltipWidth - margin;
             }
-            if (dx < margin) dx = margin as double;
+            if (dx < margin) dx = margin.toDouble();
 
             // Ajuste vertical seguro
             if (dy + tooltipHeight + margin > chartHeight) {
               dy = chartHeight - tooltipHeight - margin;
             }
-            if (dy < margin) dy = margin as double;
+            if (dy < margin) dy = margin.toDouble();
 
             touchPosition = Offset(dx, dy);
           });

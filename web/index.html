@@ -31,6 +31,129 @@
 
   <title>teleonco_capacita</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    #install-banner {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    #install-banner .install-card {
+      pointer-events: auto;
+      width: min(100%, 440px);
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #111827;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+      display: grid;
+      gap: 12px;
+      font-family: system-ui, sans-serif;
+    }
+
+    #install-banner .install-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    #install-banner .install-text {
+      font-size: 14px;
+      color: #4b5563;
+      margin: 0;
+    }
+
+    #install-banner .install-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    #install-banner button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #install-banner button.primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    #install-banner button.secondary {
+      background: rgba(15, 23, 42, 0.08);
+      color: #111827;
+    }
+  </style>
+  <script>
+    (() => {
+      const installKey = 'teleonco_capacita_install_prompt_shown';
+      const installedKey = 'teleonco_capacita_installed';
+      let deferredPrompt = null;
+
+      const isFirstVisit = !localStorage.getItem(installKey);
+      const alreadyInstalled = localStorage.getItem(installedKey) === 'true';
+
+      const createBanner = () => {
+        if (!deferredPrompt || !isFirstVisit || alreadyInstalled) return;
+        if (document.getElementById('install-banner')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'install-banner';
+        banner.innerHTML = `
+          <div class="install-card">
+            <div class="install-title">Instale o app TeleOnco Capacita</div>
+            <div class="install-text">Abra rapidinho na sua tela inicial e acesse offline sempre que precisar.</div>
+            <div class="install-actions">
+              <button id="install-btn" class="primary">Instalar</button>
+              <button id="dismiss-btn" class="secondary">Fechar</button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(banner);
+
+        document.getElementById('install-btn').addEventListener('click', async () => {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          const choice = await deferredPrompt.userChoice;
+          if (choice.outcome === 'accepted') {
+            localStorage.setItem(installedKey, 'true');
+          }
+          localStorage.setItem(installKey, 'true');
+          banner.remove();
+          deferredPrompt = null;
+        });
+
+        document.getElementById('dismiss-btn').addEventListener('click', () => {
+          localStorage.setItem(installKey, 'true');
+          banner.remove();
+        });
+      };
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        createBanner();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        localStorage.setItem(installedKey, 'true');
+        localStorage.setItem(installKey, 'true');
+        const banner = document.getElementById('install-banner');
+        if (banner) banner.remove();
+      });
+    })();
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

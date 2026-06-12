@@ -100,16 +100,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ---------- KPI CARD ----------
   Widget kpiCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      width: 180,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-      ),
-      child: Row(
-        children: [
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 160, maxWidth: 220),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+        ),
+        child: Row(
+          children: [
           CircleAvatar(
             radius: 22,
             backgroundColor: color.withOpacity(.15),
@@ -133,8 +134,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           )
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +175,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ...{...all.map((e) => e.area)}
     ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 720;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F9),
       body: SafeArea(
@@ -180,25 +185,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onRefresh: () => _fetchData(),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 24,
+                vertical: isMobile ? 12 : 20,
+              ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ---------- HEADER ----------
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("📊 Dashboard Teleonco Capacita",
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold)),
-                      Text("Atualizado: $lastUpdated"),
-                    ],
-                  ),
+                  isMobile
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("📊 Dashboard Teleonco Capacita",
+                                style: TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 8),
+                            Text("Atualizado: $lastUpdated"),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("📊 Dashboard Teleonco Capacita",
+                                style: TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.bold)),
+                            Text("Atualizado: $lastUpdated"),
+                          ],
+                        ),
                   const SizedBox(height: 20),
 
                   // ---------- KPIs RESPONSIVOS ----------
                   Wrap(
                     spacing: 16,
                     runSpacing: 16,
+                    alignment: WrapAlignment.spaceBetween,
                     children: [
                       kpiCard("Profissionais Capacitados",
                           "$totalProfissionais", Icons.group, Colors.blue),
@@ -224,7 +245,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
                   // ---------- FILTROS RESPONSIVOS ----------
                   Wrap(
@@ -254,21 +275,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 20),
 
                   // ---------- GRÁFICOS ----------
-                  chartCard("Distribuição por Área",
-                      PieChartWidget(capacitations: filtered)),
-                  chartCard("Conclusão por Área",
-                      BarChartWidget(capacitations: filtered)),
-                  chartCard("Engajamento por Mês",
-                      LineChartWidget(capacitations: filtered)),
-                  chartCard("Satisfação",
-                      CandlestickChartWidget(capacitations: filtered)),
-                  chartCard("Inscritos x Ativos x Certificados",
-                      FunnelChartWidget(capacitations: filtered)),
-                  chartCard("Alcance da Divulgação",
-                      DivulgacaoChartWidget(capacitations: filtered)),
+                  chartCard(
+                    "Distribuição por Área",
+                    PieChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
+                  chartCard(
+                    "Conclusão por Área",
+                    BarChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
+                  chartCard(
+                    "Engajamento por Mês",
+                    LineChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
+                  chartCard(
+                    "Satisfação",
+                    CandlestickChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
+                  chartCard(
+                    "Inscritos x Ativos x Certificados",
+                    FunnelChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
+                  chartCard(
+                    "Alcance da Divulgação",
+                    DivulgacaoChartWidget(capacitations: filtered),
+                    isMobile: isMobile,
+                  ),
                   chartCard(
                     "Ranking de Municípios",
                     MunicipioRankingWidget(capacitations: filtered),
+                    isMobile: isMobile,
                   ),
 
                   const SizedBox(height: 40),
@@ -285,7 +325,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget filtro(String label, String value, List<String> items,
       void Function(String?) onChanged) {
     return SizedBox(
-      width: 200,
+      width: 180,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -313,7 +353,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   /// ---------- CARD DOS GRÁFICOS ----------
-  Widget chartCard(String title, Widget child) {
+  Widget chartCard(String title, Widget child, {bool isMobile = false}) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -330,7 +370,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             /// Altura agora é **flexível e segura**
             SizedBox(
-              height: 350,
+              height: isMobile ? 300 : 350,
               child: child,
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/capacitation_provider.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const TeleoncoCapacitaApp());
@@ -110,7 +111,7 @@ class TeleoncoCapacitaApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         // 👉 Troque para ThemeMode.system se quiser automático
 
-        home: const DashboardScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
